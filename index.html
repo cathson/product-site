@@ -50,7 +50,7 @@
         }
 
         select {
-            width: 218px;
+            width: 210px;
         }
 
         /* 结果显示的样式 */
@@ -180,7 +180,7 @@
         .btn-primary {
             background-color: #4CAF50;
             color: white;
-            height: 50px;
+            height: 29px;
         }
 
         .btn-danger {
@@ -359,6 +359,11 @@
         <div class="product-list">
             <div class="product-actions">
                 <button class="btn btn-primary" onclick="showAddForm()">添加产品</button>
+            </div>
+            <div class="form-row">
+                <label for="searchSku">搜索 SKU:</label>
+                <input type="text" id="searchSku" placeholder="输入 SKU">
+                <button type="button" class="btn btn-primary" onclick="searchProduct()">搜索</button>
             </div>
 
             <!-- 产品添加/编辑表单 -->
@@ -760,6 +765,40 @@
                 option.value = sku;
                 option.textContent = `${sku} - ${products[sku].platform}`;
                 select.appendChild(option);
+            });
+        }
+
+        function searchProduct() {
+            const searchSku = document.getElementById('searchSku').value.trim();
+            const container = document.getElementById('productList');
+            container.innerHTML = ''; // 清空当前产品列表
+
+            Object.entries(products).forEach(([sku, product]) => {
+                if (sku.includes(searchSku)) { // 检查 SKU 是否包含搜索内容
+                    const card = document.createElement('div');
+                    card.className = 'product-card';
+                    card.onclick = () => {
+                        document.getElementById('productSelect').value = sku;
+                        loadProduct(sku);
+                    };
+                    
+                    card.innerHTML = `
+                        <div class="product-info">
+                            <div class="product-sku">SKU: ${sku}</div>
+                            <div class="product-details">
+                                平台仓: ${product.platform}<br>
+                                重量: ${product.weight}kg<br>
+                                采购单价: ¥${product.purchasePrice}<br>
+                                头程费用: ¥${product.firstShippingCost}
+                            </div>
+                        </div>
+                        <div class="product-actions" onclick="event.stopPropagation()">
+                            <button class="btn btn-edit" onclick="showEditForm('${sku}')">编辑</button>
+                            <button class="btn btn-danger" onclick="deleteProduct('${sku}')">删除</button>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                }
             });
         }
     </script>
