@@ -554,7 +554,7 @@
             document.getElementById("totalCost").value = totalCost.toFixed(2);
 
             // 计算运费总额
-            const shippingCost = price > 499 * exchangeRate ? 0 : 68.97 * exchangeRate;
+            const shippingCost = price > 499 / exchangeRate ? 0 : 68.97 / exchangeRate;
             document.getElementById("shippingCost").value = shippingCost.toFixed(2);
 
             // 计算税金
