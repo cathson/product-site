@@ -216,196 +216,234 @@
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+
+        /* 新增样式以居中显示标签 */
+        .tab-container {
+            text-align: center; /* 水平居中 */
+            margin: 20px 0; /* 上下间距 */
+        }
+
+        .tab {
+            display: inline-block;
+            padding: 10px 20px;
+            cursor: pointer;
+            border: 1px solid #4CAF50;
+            border-radius: 4px;
+            margin-right: 5px;
+            background-color: white;
+            color: #4CAF50;
+        }
+        .tab.active {
+            background-color: #4CAF50;
+            color: white;
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
 </head>
 <body>
-    <h2>Temu利润测算</h2>  
-    <div class="container">
-        <div class="exchange-rate-container">
-            <h4>汇率互换</h4>
-            <div>
-                <label for="rmbInput">人民币:</label>
-                <input type="number" id="rmbInput" placeholder="输入人民币" oninput="convertToMXN()">
-            </div>
-            <div>
-                <label for="mxnInput">墨西哥比索:</label>
-                <input type="number" id="mxnInput" placeholder="输入比索" oninput="convertToRMB()">
-            </div>
-        </div>
-        <!-- 左侧计算器 -->
-        <div class="calculator">
-            <form>
-                <div class="form-row">
-                    <label for="productSelect">产品:</label>
-                    <select id="productSelect" onchange="loadSelectedProduct()">
-                        <option value="">请选择产品</option>
-                    </select>
+    <div class="tab-container"> <!-- 使用新的容器 -->
+        <span id="temuTab" class="tab active" onclick="showTemu()">Temu</span>
+        <span id="sheinTab" class="tab" onclick="showShein()">Shein</span>
+    </div>
+    
+    <div id="temuCalculator" class="calculator">
+        <h2>Temu利润测算</h2>
+        
+        <div class="container">
+            <div class="exchange-rate-container">
+                <h4>汇率互换</h4>
+                <div>
+                    <label for="rmbInput">人民币:</label>
+                    <input type="number" id="rmbInput" placeholder="输入人民币" oninput="convertToMXN()">
                 </div>
+                <div>
+                    <label for="mxnInput">墨西哥比索:</label>
+                    <input type="number" id="mxnInput" placeholder="输入比索" oninput="convertToRMB()">
+                </div>
+            </div>
+            <!-- 左侧计算器 -->
+            <div class="calculator">
+                <form>
+                    <div class="form-row">
+                        <label for="productSelect">产品:</label>
+                        <select id="productSelect" onchange="loadSelectedProduct()">
+                            <option value="">请选择产品</option>
+                        </select>
+                    </div>
 
-                <div class="form-row">
-                    <label for="platform">平台仓:</label>
-                    <select id="platform" onchange="updateValues()">
-                        <option value="蓝舸">蓝舸</option>
-                        <option value="亿莱博">亿莱博</option>
-                        <option value="日升辉">日升辉</option>
-                        <option value="拉美">拉美</option>
-                    </select>
-                </div>
-                
-                <div class="form-row">
-                    <label for="exchangeRate">实时汇率:</label>
-                    <input type="number" id="exchangeRate" value="0.35" step="0.01" readonly disabled>
-                </div>
+                    <div class="form-row">
+                        <label for="platform">平台仓:</label>
+                        <select id="platform" onchange="updateValues()">
+                            <option value="蓝舸">蓝舸</option>
+                            <option value="亿莱博">亿莱博</option>
+                            <option value="日升辉">日升辉</option>
+                            <option value="拉美">拉美</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="exchangeRate">实时汇率:</label>
+                        <input type="number" id="exchangeRate" value="0.35" step="0.01" readonly disabled>
+                    </div>
                              
-                
-                <div class="form-row">
-                    <label for="priceMarkup">加价比例:</label>
-                    <input type="number" id="priceMarkup" value="1.227" step="0.01" oninput="updateValues()">
-                </div>
-                
-                <div class="form-row">
-                    <label for="weight">重量 (kg):</label>
-                    <input type="number" id="weight" value="5.65" step="0.01" oninput="updateValues()">
-                </div>
-                
-                <div class="form-row">
-                    <label for="purchasePrice">采购单价:</label>
-                    <input type="number" id="purchasePrice" value="270" step="0.01" oninput="updateValues()">
-                </div>
-                
-                <div class="form-row">
-                    <label for="firstShippingCost">头程费用:</label>
-                    <input type="number" id="firstShippingCost" value="61.6612" step="0.01" oninput="updateValues()">
-                </div>
-                
-                <div class="form-row">
-                    <label for="supplyPrice">供货价:</label>
-                    <input type="number" id="supplyPrice" step="0.01" oninput="updateValues()">
-                </div>
-                
-                <div class="form-row">
-                    <label for="price">售价:</label>
-                    <input type="text" id="price" disabled>
-                </div>
-                
-                <div class="form-row">
-                    <label for="outOfStockCost">出库操作费:</label>
-                    <input type="text" id="outOfStockCost" disabled>
-                </div>
-                
-                <div class="form-row">
-                    <label for="shelfClearanceCost">上架清点费:</label>
-                    <input type="text" id="shelfClearanceCost" disabled>
-                </div>
-                
-                <div class="form-row">
-                    <label for="warehouseCost">仓储费用:</label>
-                    <input type="text" id="warehouseCost" disabled>
-                </div>
-                
-                <div class="form-row">
-                    <label for="agentFee">送代理点费用:</label>
-                    <input type="text" id="agentFee" disabled>
-                </div>
-                
-                <div class="form-row">
-                    <label for="totalCost">总成本:</label>
-                    <input type="text" id="totalCost" disabled>
-                </div>
-                
-                <div class="form-row">
-                    <label for="shippingCost">运费补贴:</label>
-                    <input type="text" id="shippingCost" disabled>
-                </div>
-                
-                <div class="form-row">
-                    <label for="totalTax">税金:</label>
-                    <input type="text" id="totalTax" disabled>
-                </div>
-                
-                <div class="form-row">
-                    <label for="promotionDiscount">促销优惠:</label>
-                    <input type="text" id="promotionDiscount" disabled>
-                </div>
-                
-                <div class="form-row">
-                    <label for="discountedTax">优惠后税金:</label>
-                    <input type="text" id="discountedTax" disabled>
-                </div>
-                
-                <div class="form-row">
-                    <label for="labelCost">购买面单费:</label>
-                    <input type="number" id="labelCost" value="12" step="0.01" oninput="updateValues()">
-                </div>
-                
-                <div class="form-row">
-                    <label for="totalIncome">总收入:</label>
-                    <input type="text" id="totalIncome" disabled>
-                </div>
-                
-                <div class="form-row">
-                    <label for="profit">利润:</label>
-                    <input type="text" id="profit" disabled>
-                </div>
-                
-                <div class="form-row">
-                    <label for="profitMargin">利润率:</label>
-                    <input type="text" id="profitMargin" disabled>
-                </div>
-            </form>
-        </div>
-
-        <!-- 右侧产品列表 -->
-        <div class="product-list">
-            <div class="product-actions">
-                <button class="btn btn-primary" onclick="showAddForm()">添加产品</button>
-            </div>
-            <div class="form-row">
-                <label for="searchSku">搜索 SKU:</label>
-                <input type="text" id="searchSku" placeholder="输入 SKU">
-                <button type="button" class="btn btn-primary" onclick="searchProduct()">搜索</button>
+                    
+                    <div class="form-row">
+                        <label for="priceMarkup">加价比例:</label>
+                        <input type="number" id="priceMarkup" value="1.227" step="0.01" oninput="updateValues()">
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="weight">重量 (kg):</label>
+                        <input type="number" id="weight" value="5.65" step="0.01" oninput="updateValues()">
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="purchasePrice">采购单价:</label>
+                        <input type="number" id="purchasePrice" value="270" step="0.01" oninput="updateValues()">
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="firstShippingCost">头程费用:</label>
+                        <input type="number" id="firstShippingCost" value="61.6612" step="0.01" oninput="updateValues()">
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="supplyPrice">供货价:</label>
+                        <input type="number" id="supplyPrice" step="0.01" oninput="updateValues()">
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="price">售价:</label>
+                        <input type="text" id="price" disabled>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="outOfStockCost">出库操作费:</label>
+                        <input type="text" id="outOfStockCost" disabled>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="shelfClearanceCost">上架清点费:</label>
+                        <input type="text" id="shelfClearanceCost" disabled>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="warehouseCost">仓储费用:</label>
+                        <input type="text" id="warehouseCost" disabled>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="agentFee">送代理点费用:</label>
+                        <input type="text" id="agentFee" disabled>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="totalCost">总成本:</label>
+                        <input type="text" id="totalCost" disabled>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="shippingCost">运费补贴:</label>
+                        <input type="text" id="shippingCost" disabled>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="totalTax">税金:</label>
+                        <input type="text" id="totalTax" disabled>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="promotionDiscount">促销优惠:</label>
+                        <input type="text" id="promotionDiscount" disabled>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="discountedTax">优惠后税金:</label>
+                        <input type="text" id="discountedTax" disabled>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="labelCost">购买面单费:</label>
+                        <input type="number" id="labelCost" value="17" step="0.01" oninput="updateValues()">
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="totalIncome">总收入:</label>
+                        <input type="text" id="totalIncome" disabled>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="profit">利润:</label>
+                        <input type="text" id="profit" disabled>
+                    </div>
+                    
+                    <div class="form-row">
+                        <label for="profitMargin">利润率:</label>
+                        <input type="text" id="profitMargin" disabled>
+                    </div>
+                </form>
             </div>
 
-            <!-- 产品添加/编辑表单 -->
-            <div id="productForm" class="product-form">
-                <h4 id="formTitle">添加产品</h4>
-                <input type="hidden" id="editingSku">
-                <div class="form-row">
-                    <label>SKU:</label>
-                    <input type="text" id="skuInput" required>
+            <!-- 右侧产品列表 -->
+            <div class="product-list">
+                <div class="product-actions">
+                    <button class="btn btn-primary" onclick="showAddForm()">添加产品</button>
                 </div>
                 <div class="form-row">
-                    <label>平台仓:</label>
-                    <select id="platformInput">
-                        <option value="蓝舸">蓝舸</option>
-                        <option value="亿莱博">亿莱博</option>
-                        <option value="日升辉">日升辉</option>
-                        <option value="拉美">拉美</option>
-                    </select>
+                    <label for="searchSku">搜索 SKU:</label>
+                    <input type="text" id="searchSku" placeholder="输入 SKU">
+                    <button type="button" class="btn btn-primary" onclick="searchProduct()">搜索</button>
                 </div>
-                <div class="form-row">
-                    <label>重量(kg):</label>
-                    <input type="number" id="weightInput" step="0.01" required>
+
+                <!-- 产品添加/编辑表单 -->
+                <div id="productForm" class="product-form">
+                    <h4 id="formTitle">添加产品</h4>
+                    <input type="hidden" id="editingSku">
+                    <div class="form-row">
+                        <label>SKU:</label>
+                        <input type="text" id="skuInput" required>
+                    </div>
+                    <div class="form-row">
+                        <label>平台仓:</label>
+                        <select id="platformInput">
+                            <option value="蓝舸">蓝舸</option>
+                            <option value="亿莱博">亿莱博</option>
+                            <option value="日升辉">日升辉</option>
+                            <option value="拉美">拉美</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label>重量(kg):</label>
+                        <input type="number" id="weightInput" step="0.01" required>
+                    </div>
+                    <div class="form-row">
+                        <label>采购单价:</label>
+                        <input type="number" id="purchasePriceInput" step="0.01" required>
+                    </div>
+                    <div class="form-row">
+                        <label>头程费用:</label>
+                        <input type="number" id="firstShippingCostInput" step="0.01" required>
+                    </div>
+                    <div class="form-row">
+                        <button type="button" class="btn btn-primary" onclick="saveProduct()">保存</button>
+                        <button type="button" class="btn btn-danger" onclick="cancelEdit()">取消</button>
+                    </div>
                 </div>
-                <div class="form-row">
-                    <label>采购单价:</label>
-                    <input type="number" id="purchasePriceInput" step="0.01" required>
-                </div>
-                <div class="form-row">
-                    <label>头程费用:</label>
-                    <input type="number" id="firstShippingCostInput" step="0.01" required>
-                </div>
-                <div class="form-row">
-                    <button type="button" class="btn btn-primary" onclick="saveProduct()">保存</button>
-                    <button type="button" class="btn btn-danger" onclick="cancelEdit()">取消</button>
-                </div>
+                
+                <!-- 产品列表容器 -->
+                <div id="productList"></div>
             </div>
-            
-            <!-- 产品列表容器 -->
-            <div id="productList"></div>
         </div>
     </div>
+
+    <div id="sheinCalculator" class="calculator" style="display: none;">
+        <!-- Shein的内容，初始隐藏 -->
+        <h2>Shein利润测算</h2>
+        <form>
+            <!-- 这里将来放Shein的表单内容 -->
+        </form>
+    </div>
+
     <script>
         let products = {}; // 存储产品信息的对象
 
@@ -516,7 +554,7 @@
             document.getElementById("totalCost").value = totalCost.toFixed(2);
 
             // 计算运费总额
-            const shippingCost = price > 106.74582 ? 0 : 24.62;
+            const shippingCost = price > 499 * exchangeRate ? 0 : 68.97 * exchangeRate;
             document.getElementById("shippingCost").value = shippingCost.toFixed(2);
 
             // 计算税金
@@ -526,7 +564,7 @@
             document.getElementById("totalTax").value = totalTax.toFixed(2);
 
             // 计算促销优惠
-            const promotionDiscount = price * 0.08;
+            const promotionDiscount = price * 0.30; // 修改为售价的 30%
             document.getElementById("promotionDiscount").value = promotionDiscount.toFixed(2);
 
             // 计算优惠后税金
@@ -802,6 +840,23 @@
                 }
             });
         }
+
+        function showTemu() {
+            document.getElementById('temuCalculator').style.display = 'block';
+            document.getElementById('sheinCalculator').style.display = 'none';
+            document.getElementById('temuTab').classList.add('active');
+            document.getElementById('sheinTab').classList.remove('active');
+        }
+
+        function showShein() {
+            document.getElementById('temuCalculator').style.display = 'none';
+            document.getElementById('sheinCalculator').style.display = 'block';
+            document.getElementById('temuTab').classList.remove('active');
+            document.getElementById('sheinTab').classList.add('active');
+        }
+
+        // 默认显示Temu的内容
+        showTemu();
     </script>
 </body>
 </html>
