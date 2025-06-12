@@ -232,6 +232,7 @@
             margin-right: 5px;
             background-color: white;
             color: #4CAF50;
+            text-decoration: none;
         }
         .tab.active {
             background-color: #4CAF50;
@@ -241,10 +242,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
 </head>
 <body>
-    <div class="tab-container"> <!-- 使用新的容器 -->
-        <span id="temuTab" class="tab active" onclick="showTemu()">Temu</span>
-        <span id="sheinTab" class="tab" onclick="showShein()">Shein</span>
+    <div class="tab-container">
+        <a href="index.html" id="temuTab" class="tab active">Temu</a>
+        <a href="shein.html" id="temuTab" class="tab active">Shein</a>
     </div>
+    
     
     <div id="temuCalculator" class="calculator">
         <h2>Temu利润测算</h2>
@@ -278,6 +280,7 @@
                             <option value="亿莱博">亿莱博</option>
                             <option value="日升辉">日升辉</option>
                             <option value="拉美">拉美</option>
+                            <option value="墨链">墨链</option>
                         </select>
                     </div>
                     
@@ -312,6 +315,11 @@
                         <input type="number" id="supplyPrice" step="0.01" oninput="updateValues()">
                     </div>
                     
+                    <div class="form-row">
+                        <label for="sellernum">购买数量:</label>
+                        <input type="number" id="sellernum" step="1" value="1" oninput="updateValues()">
+                    </div>
+
                     <div class="form-row">
                         <label for="price">售价:</label>
                         <input type="text" id="price" disabled>
@@ -364,7 +372,7 @@
                     
                     <div class="form-row">
                         <label for="labelCost">购买面单费:</label>
-                        <input type="number" id="labelCost" value="17" step="0.01" oninput="updateValues()">
+                        <input type="number" id="labelCost" value="12" step="0.01" oninput="updateValues()">
                     </div>
                     
                     <div class="form-row">
@@ -410,6 +418,7 @@
                             <option value="亿莱博">亿莱博</option>
                             <option value="日升辉">日升辉</option>
                             <option value="拉美">拉美</option>
+                            <option value="墨链">墨链</option>
                         </select>
                     </div>
                     <div class="form-row">
@@ -436,14 +445,6 @@
         </div>
     </div>
 
-    <div id="sheinCalculator" class="calculator" style="display: none;">
-        <!-- Shein的内容，初始隐藏 -->
-        <h2>Shein利润测算</h2>
-        <form>
-            <!-- 这里将来放Shein的表单内容 -->
-        </form>
-    </div>
-
     <script>
         let products = {}; // 存储产品信息的对象
 
@@ -458,20 +459,21 @@
             const firstShippingCost = parseFloat(document.getElementById("firstShippingCost").value) || 0;
             const supplyPrice = parseFloat(document.getElementById("supplyPrice").value) || 0;
             const labelCost = parseFloat(document.getElementById("labelCost").value) || 0;
+            const sellernum = parseFloat(document.getElementById("sellernum").value) || 0;
             
             // 计算售价
-            const price = supplyPrice * priceMarkup;
+            const price = supplyPrice * priceMarkup * sellernum;
             document.getElementById("price").value = price.toFixed(2);
 
             // 计算出库操作费
             let outOfStockCost = 0;
             if (platform === "蓝舸") {
-                if (weight <= 0.5) outOfStockCost = 5 * exchangeRate * 0.1;
-                else if (weight <= 1) outOfStockCost = 7 * exchangeRate * 0.1;
-                else if (weight <= 3) outOfStockCost = 10 * exchangeRate * 0.1;
-                else if (weight <= 5) outOfStockCost = 15 * exchangeRate * 0.1;
-                else if (weight <= 10) outOfStockCost = 20 * exchangeRate * 0.1;
-                else if (weight <= 20) outOfStockCost = 30 * exchangeRate * 0.1;
+                if (weight <= 0.5) outOfStockCost = 5 * exchangeRate * 0.1 * sellernum;
+                else if (weight <= 1) outOfStockCost = 7 * exchangeRate * 0.1 * sellernum;
+                else if (weight <= 3) outOfStockCost = 10 * exchangeRate * 0.1 * sellernum;
+                else if (weight <= 5) outOfStockCost = 15 * exchangeRate * 0.1 * sellernum;
+                else if (weight <= 10) outOfStockCost = 20 * exchangeRate * 0.1 * sellernum;
+                else if (weight <= 20) outOfStockCost = 30 * exchangeRate * 0.1 * sellernum;
                 else outOfStockCost = 40 * price;
             } else if (platform === "亿莱博") {
                 if (weight <= 0.5) outOfStockCost = 1.92;
@@ -492,26 +494,26 @@
                 else if (weight <= 40) outOfStockCost = 30;
                 else if (weight <= 50) outOfStockCost = 45;
             } else if (platform === "拉美") {
-                if (weight <= 0.5) outOfStockCost = 5 * exchangeRate * 0.1;
-                else if (weight <= 1) outOfStockCost = 6 * exchangeRate * 0.1;
-                else if (weight <= 2) outOfStockCost = 7 * exchangeRate * 0.1;
-                else if (weight <= 3) outOfStockCost = 8 * exchangeRate * 0.1;
-                else if (weight <= 5) outOfStockCost = 11 * exchangeRate * 0.1;
-                else if (weight <= 10) outOfStockCost = 15 * exchangeRate * 0.1;
-                else if (weight <= 20) outOfStockCost = 27 * exchangeRate * 0.1;
-                else if (weight <= 30) outOfStockCost = 35 * exchangeRate * 0.1;
-                else if (weight <= 70) outOfStockCost = 85 * exchangeRate * 0.1;
+                if (weight <= 0.5) outOfStockCost = 5 * exchangeRate * 0.1 * sellernum;
+                else if (weight <= 1) outOfStockCost = 6 * exchangeRate * 0.1 * sellernum;
+                else if (weight <= 2) outOfStockCost = 7 * exchangeRate * 0.1 * sellernum;
+                else if (weight <= 3) outOfStockCost = 8 * exchangeRate * 0.1 * sellernum;
+                else if (weight <= 5) outOfStockCost = 11 * exchangeRate * 0.1 * sellernum;
+                else if (weight <= 10) outOfStockCost = 15 * exchangeRate * 0.1 * sellernum;
+                else if (weight <= 20) outOfStockCost = 27 * exchangeRate * 0.1 * sellernum;
+                else if (weight <= 30) outOfStockCost = 35 * exchangeRate * 0.1 * sellernum;
+                else if (weight <= 70) outOfStockCost = 85 * exchangeRate * 0.1 * sellernum;
             }
             document.getElementById("outOfStockCost").value = outOfStockCost.toFixed(2);
 
             // 计算上架清点费
             let shelfClearanceCost = 0;
             if (platform === "蓝舸") {
-                if (weight <= 0.5) shelfClearanceCost = 8 * exchangeRate * 0.1;
-                else if (weight <= 1) shelfClearanceCost = 10 * exchangeRate * 0.1;
-                else if (weight <= 5) shelfClearanceCost = 12 * exchangeRate * 0.1;
-                else if (weight <= 10) shelfClearanceCost = 14 * exchangeRate * 0.1;
-                else if (weight <= 30) shelfClearanceCost = 16 * exchangeRate * 0.1;
+                if (weight <= 0.5) shelfClearanceCost = 8 * exchangeRate * 0.1 * sellernum;
+                else if (weight <= 1) shelfClearanceCost = 10 * exchangeRate * 0.1 * sellernum;
+                else if (weight <= 5) shelfClearanceCost = 12 * exchangeRate * 0.1 * sellernum;
+                else if (weight <= 10) shelfClearanceCost = 14 * exchangeRate * 0.1 * sellernum;
+                else if (weight <= 30) shelfClearanceCost = 16 * exchangeRate * 0.1 * sellernum;
                 else shelfClearanceCost = 20 * exchangeRate;
             } else if (platform === "亿莱博") {
                 if (weight <= 0.5) shelfClearanceCost = 3.46;
@@ -526,15 +528,24 @@
             } else if (platform === "日升辉") {
                 shelfClearanceCost = 1.5;
             } else if (platform === "拉美") {
-                if (weight <= 0.5) shelfClearanceCost = 9 * exchangeRate * 0.1;
-                else if (weight <= 1) shelfClearanceCost = 9.5 * exchangeRate * 0.1;
-                else if (weight <= 2) shelfClearanceCost = 10 * exchangeRate * 0.1;
-                else if (weight <= 3) shelfClearanceCost = 10.5 * exchangeRate * 0.1;
-                else if (weight <= 5) shelfClearanceCost = 12 * exchangeRate * 0.1;
-                else if (weight <= 10) shelfClearanceCost = 14 * exchangeRate * 0.1;
-                else if (weight <= 20) shelfClearanceCost = 21 * exchangeRate * 0.1;
-                else if (weight <= 30) shelfClearanceCost = 24 * exchangeRate * 0.1;
-                else if (weight <= 70) shelfClearanceCost = 39 * exchangeRate * 0.1;
+                if (weight <= 0.5) shelfClearanceCost = 9 * exchangeRate * 0.1 * sellernum;
+                else if (weight <= 1) shelfClearanceCost = 9.5 * exchangeRate * 0.1 * sellernum;
+                else if (weight <= 2) shelfClearanceCost = 10 * exchangeRate * 0.1 * sellernum;
+                else if (weight <= 3) shelfClearanceCost = 10.5 * exchangeRate * 0.1 * sellernum;
+                else if (weight <= 5) shelfClearanceCost = 12 * exchangeRate * 0.1 * sellernum;
+                else if (weight <= 10) shelfClearanceCost = 14 * exchangeRate * 0.1 * sellernum;
+                else if (weight <= 20) shelfClearanceCost = 21 * exchangeRate * 0.1 * sellernum;
+                else if (weight <= 30) shelfClearanceCost = 24 * exchangeRate * 0.1 * sellernum;
+                else if (weight <= 70) shelfClearanceCost = 39 * exchangeRate * 0.1 * sellernum;
+            } else if (platform === "墨链") {
+                if (weight <= 0.5) shelfClearanceCost = 6.5 * sellernum;
+                else if (weight <= 2) shelfClearanceCost = 7.5 * sellernum;
+                else if (weight <= 5) shelfClearanceCost = 9 * sellernum;
+                else if (weight <= 10) shelfClearanceCost = 10 * sellernum;
+                else if (weight <= 15) shelfClearanceCost = 12 * sellernum;
+                else if (weight <= 20) shelfClearanceCost = 15 * sellernum;
+                else if (weight <= 30) shelfClearanceCost = 18 * sellernum;
+                else if (weight <= 70) shelfClearanceCost = 33 * sellernum;
             }
             document.getElementById("shelfClearanceCost").value = shelfClearanceCost.toFixed(2);
 
@@ -550,11 +561,11 @@
             document.getElementById("agentFee").value = agentFee.toFixed(2);
 
             // 计算总成本
-            const totalCost = purchasePrice + firstShippingCost + outOfStockCost + shelfClearanceCost + warehouseCost + agentFee;
+            const totalCost = ((purchasePrice + firstShippingCost) * sellernum) + outOfStockCost + shelfClearanceCost + warehouseCost + agentFee;
             document.getElementById("totalCost").value = totalCost.toFixed(2);
 
             // 计算运费总额
-            const shippingCost = price > 499 / exchangeRate ? 0 : 68.97 / exchangeRate;
+            const shippingCost = price > 299 / exchangeRate ? 0 : 25.8 / exchangeRate;
             document.getElementById("shippingCost").value = shippingCost.toFixed(2);
 
             // 计算税金
@@ -564,7 +575,7 @@
             document.getElementById("totalTax").value = totalTax.toFixed(2);
 
             // 计算促销优惠
-            const promotionDiscount = price * 0.30; // 修改为售价的 30%
+            const promotionDiscount = supplyPrice * 0.30 * sellernum; 
             document.getElementById("promotionDiscount").value = promotionDiscount.toFixed(2);
 
             // 计算优惠后税金
@@ -572,7 +583,7 @@
             document.getElementById("discountedTax").value = discountedTax.toFixed(2);
 
             // 计算总收入
-            const totalIncome = supplyPrice + shippingCost + discountedTax - labelCost;
+            const totalIncome = supplyPrice * sellernum + shippingCost + discountedTax - labelCost;
             document.getElementById("totalIncome").value = totalIncome.toFixed(2);
 
             // 计算利润
@@ -841,22 +852,6 @@
             });
         }
 
-        function showTemu() {
-            document.getElementById('temuCalculator').style.display = 'block';
-            document.getElementById('sheinCalculator').style.display = 'none';
-            document.getElementById('temuTab').classList.add('active');
-            document.getElementById('sheinTab').classList.remove('active');
-        }
-
-        function showShein() {
-            document.getElementById('temuCalculator').style.display = 'none';
-            document.getElementById('sheinCalculator').style.display = 'block';
-            document.getElementById('temuTab').classList.remove('active');
-            document.getElementById('sheinTab').classList.add('active');
-        }
-
-        // 默认显示Temu的内容
-        showTemu();
     </script>
 </body>
 </html>
